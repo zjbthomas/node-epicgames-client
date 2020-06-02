@@ -221,10 +221,17 @@ Searchs entitlement in your entitlements.
 Fetchs your account's entitlements.
 - **Returns:** `array` of entitlements or `false`
 
-### getOffersForSlug(slug, locale)
+### getProductFromSlug(slug, locale)
 Fetchs all offers for given namespace.
 - **Arguments**
   - **slug** - string, e.g. `grand-theft-auto-v` for GTA V
+  - **locale** - string, e.g. `en-US` (default)
+- **Returns:** `array` of offers or `false`
+
+### getBundleFromSlug(slug, locale)
+Fetchs all offers for given namespace.
+- **Arguments**
+  - **slug** - string, e.g. `borderlands-the-handsome-collection` for Borderlands: The Handsome Collection
   - **locale** - string, e.g. `en-US` (default)
 - **Returns:** `array` of offers or `false`
 

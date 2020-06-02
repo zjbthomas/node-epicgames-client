@@ -7,6 +7,7 @@ module.exports = Object.freeze({
   PURCHASE: 'https://payment-website-pci.ol.epicgames.com/purchase',
   CATALOG_OFFERS: 'https://catalog-public-service-prod06.ol.epicgames.com/catalog/api/shared/namespace/{{namespace}}/offers', // |/bulk/offers ?id=09176f4ff7564bbbb499bbe20bd6348f&returnItemDetails=false&country=PL&locale=pl
   CATALOG_PRODUCTS: 'https://store-content.ak.epicgames.com/api/{{locale}}/content/products/{{slug}}',
+  CATALOG_BUNDLES: 'https://store-content.ak.epicgames.com/api/{{locale}}/content/bundles/{{slug}}',
     
   ENTITLEMENTS: 'https://entitlement-public-service-prod08.ol.epicgames.com/entitlement/api/account/{{account_id}}/entitlements', // ?start=0&count=5000
 
