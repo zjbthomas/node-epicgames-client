@@ -468,7 +468,7 @@ class Launcher extends Events {
    * @param {*} slug 
    * @param {*} locale 
    */
-  async getBundleFromSlug(slug, locale = 'en-US') {
+  async getBundleForSlug(slug, locale = 'en-US') {
     
     try {
 
