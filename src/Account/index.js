@@ -1,5 +1,5 @@
 const ENDPOINT = require('../../resources/Endpoint');
-
+const DeviceAuth = require('./DeviceAuth');
 const Auth = require('./Auth');
 
 class Account {
@@ -16,12 +16,12 @@ class Account {
   async fetch() {
 
     try {
-            
+
       const { data } = await this.launcher.http.sendGet(
         `${ENDPOINT.ACCOUNT}/${this.id}`,
         `${this.auth.tokenType} ${this.auth.accessToken}`,
       );
-            
+
       this.displayName = data.displayName;
       this.name = data.displayName;
       this.firstName = data.name;
@@ -46,26 +46,31 @@ class Account {
     return false;
   }
 
-  async authorize(credentials, exchangeCode=null) {
+  async authorize(credentials, deviceAuth, exchangeCode=null) {
 
     this.auth = new Auth(this.launcher);
     let auth = null;
-    if (exchangeCode) {
+
+    if (deviceAuth) {
+      let deviceAuth = new DeviceAuth(this.launcher);
+      auth = await deviceAuth.getTokenWithDeviceAuth(credentials.email);
+      this.auth.setAuthParams(auth.data);
+    } else if (exchangeCode) {
       auth = await this.auth.authWithExchangeCode(exchangeCode);
     } else {
       auth = await this.auth.auth(credentials);
     }
-    
+
     if (!auth) return false;
 
     this.id = this.auth.accountId;
     await this.fetch();
-    
+
     return true;
   }
 
   async register(options) {
-    
+
     this.auth = new Auth(this.launcher);
     const auth = await this.auth.register(options);
 
@@ -73,7 +78,7 @@ class Account {
 
     this.id = this.auth.accountId;
     await this.fetch();
-    
+
     return true;
   }
 
