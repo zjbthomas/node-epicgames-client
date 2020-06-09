@@ -616,7 +616,17 @@ class Communicator extends EventEmitter {
       status: JSON.stringify(typeof status === 'object' ? status : { Status: status }),
     });
   }
+  
+  async updatePersonalStatus(to, status) {
+    if (!status) return this.stream.sendPresence(null);
+    to = new JID(`${to}@${this.host}`);
 
+    return this.stream.sendPresence({
+      to: new JID(to),
+      status: JSON.stringify(typeof status === 'object' ? status : { Status: status }),
+    });
+  }
+  
   /**
    * Sending request for presence.
    * @param {(JID|string)} to 
