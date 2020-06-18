@@ -444,12 +444,36 @@ class Launcher extends Events {
    * @param {*} slug 
    * @param {*} locale 
    */
-  async getOffersForSlug(slug, locale = 'en-US') {
+  async getProductForSlug(slug, locale = 'en-US') {
     
     try {
 
       const { data } = await this.http.sendGet(
         ENDPOINT.CATALOG_PRODUCTS.replace('{{slug}}', slug).replace('{{locale}}', locale),
+      );
+
+      return data;
+
+    } catch (err) {
+
+      this.debug.print(new Error(err));
+
+    }
+
+    return false;
+  }
+  
+  /**
+   * Returns offers for game.
+   * @param {*} slug 
+   * @param {*} locale 
+   */
+  async getBundleForSlug(slug, locale = 'en-US') {
+    
+    try {
+
+      const { data } = await this.http.sendGet(
+        ENDPOINT.CATALOG_BUNDLES.replace('{{slug}}', slug).replace('{{locale}}', locale),
       );
 
       return data;
