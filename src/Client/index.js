@@ -492,6 +492,31 @@ class Launcher extends Events {
 
     return false;
   }
+
+  /**
+   * Returns offers for game.
+   * @param {*} country 
+   * @param {*} allowCountries 
+   * @param {*} locale 
+   */
+  async freeGamesPromotions(country = 'US', allowCountries = 'US', locale = 'en-US') {
+    
+    try {
+
+      const { data } = await this.http.sendGet(
+        ENDPOINT.FREE_GAMES.replace('{{country}}', country).replace('{{allowCountries}}', allowCountries).replace('{{locale}}', locale),
+      );
+
+      return data;
+
+    } catch (err) {
+
+      this.debug.print(new Error(err));
+
+    }
+
+    return false;
+  }
   
   /**
    * Returns evaluation of product code.

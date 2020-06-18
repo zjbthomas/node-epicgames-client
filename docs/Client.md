@@ -236,6 +236,14 @@ Fetchs all offers for given namespace.
   - **start** - number
 - **Returns:** `array` of offers or `false`
 
+### freeGamesPromotions(country, allowCountries, locale)
+Fetchs all offers for given namespace.
+- **Arguments**
+  - **country** - string, e.g. `US` (default)
+  - **allowCountries** - string, e.g. `US` (default)
+  - **locale** - string, e.g. `en-US` (default)
+- **Returns:** `array` of offers or `false`
+
 ### quickPurchase(offer, quantity)
 - **Arguments**
   - **offer** - object

@@ -5,6 +5,7 @@ module.exports = Object.freeze({
   EULA_TRACKING: 'https://eulatracking-public-service-prod06.ol.epicgames.com/eulatracking/api/public/agreements/{{namespace}}',
   ORDER_QUICKPURCHASE: 'https://orderprocessor-public-service-ecomprod01.ol.epicgames.com/orderprocessor/api/shared/accounts/{{account_id}}/orders/quickPurchase', // ?country=PL&locale=pl
   PURCHASE: 'https://payment-website-pci.ol.epicgames.com/purchase',
+  FREE_GAMES: 'https://store-site-backend-static.ak.epicgames.com/freeGamesPromotions?country={{country}}&allowCountries={{allowCountries}}&locale={{locale}}',
   CATALOG_OFFERS: 'https://catalog-public-service-prod06.ol.epicgames.com/catalog/api/shared/namespace/{{namespace}}/offers', // |/bulk/offers ?id=09176f4ff7564bbbb499bbe20bd6348f&returnItemDetails=false&country=PL&locale=pl
   CATALOG_PRODUCTS: 'https://store-content.ak.epicgames.com/api/{{locale}}/content/products/{{slug}}',
     
