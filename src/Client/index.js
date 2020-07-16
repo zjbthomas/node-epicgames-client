@@ -1,5 +1,6 @@
 const Fs = require('fs');
 const Path = require('path');
+const Crypto = require('crypto');
 const Events = require('events');
 const Cheerio = require('cheerio');
 const exitHook = require('exit-hook');
@@ -79,7 +80,7 @@ class Launcher extends Events {
       engineBuild: '4.25.0-12493283+++Fortnite+Release-12.30', // named "Engine Version" in official launcher logs
       netCL: 11937518, // named "Net CL" in official launcher logs
 
-      storage: Path.join(process.cwd(), '/.egstore'),
+      storage: Path.join(process.cwd(), '/.egstore', Crypto.createHash('sha256').update(config.email || 'default').digest('hex')),
       rememberLastSession: false,
       http: {},
 
