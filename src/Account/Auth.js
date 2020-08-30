@@ -41,6 +41,17 @@ class AccountAuth {
     } catch (error) {
       if (error.response) {
         switch (error.response.statusCode) {
+          case 400:
+            let err;
+            if (error.message == 'errors.com.epicgames.accountportal.captcha_invalid') {
+              err = new Error('Invalid captcha!');
+            } else {
+              err = new Error(`Auth error: ${error.response.body.message} (${error.message})`);
+            }
+            err.error = error;
+            throw err;
+            break;
+
           case 409:
             await this.login(credentials, strategyFlags);
             break;
