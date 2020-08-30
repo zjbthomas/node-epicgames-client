@@ -87,22 +87,29 @@ class Http {
         }
 
         if (typeof body === 'object' && typeof body.errorCode !== 'undefined') {
-          
+
+          let error;
+
           switch (body.errorCode) {
 
             case 'errors.com.epicgames.common.oauth.invalid_token':
-              reject(new Error('You aren\'t logged in!'));
+              error = new Error('You aren\'t logged in!');
+              break;
+
+            case 'errors.com.epicgames.purchase.purchase.captcha.challenge':
+              error = new Error('You need to solve CAPTCHA!');
               break;
 
             default: {
               // eslint-disable-next-line no-console
               if (process.env.KYSUNE) console.dir(body);
-              const error = new Error(body.errorCode);
-              error.response = response;
-              reject(error);
+              error = new Error(body.errorCode);
             } break;
 
           }
+
+          error.response = response;
+          reject(error);
 
           return;
 
