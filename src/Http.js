@@ -123,8 +123,8 @@ class Http {
     return this.send('GET', url, auth, data, isJsonResponse, headers);
   }
 
-  sendPost(url, auth, data, isJsonResponse, headers) {
-    return this.send('POST', url, auth, data, isJsonResponse, headers);
+  sendPost(url, auth, data, isJsonResponse, headers, isJsonData) {
+    return this.send('POST', url, auth, data, isJsonResponse, headers, isJsonData);
   }
 
   sendGraphQL(auth, query, variables, headers) {

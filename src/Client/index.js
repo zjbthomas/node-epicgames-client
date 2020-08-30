@@ -588,6 +588,38 @@ class Launcher extends Events {
   }
 
   /**
+   * Get offers price.
+   * @param {Object} offer object with `offerId`
+   * @param {number} quantity
+   */
+  async getPrice(offers, quantity, country = null) {
+
+    quantity = quantity || 1;
+
+    if (!country) {
+      country = this.account.country;
+    }
+
+    const params = {
+      accountId: this.account.id,
+      calculateTax: false,
+      lineOffers: offers.map((o) => ({offerId: o.id, quantity: quantity})),
+      country: country
+    }
+
+    const { data } = await this.http.sendPost(ENDPOINT.PRICEENGINE_OFFER,
+                       `${this.account.auth.tokenType} ${this.account.auth.accessToken}`,
+                       params,
+                       true,
+                       null,
+                       true
+                     );
+
+    return data;
+  }
+
+
+  /**
    * Buy offer.
    * @param {Object} offer object with `offerId` and `namespace`
    * @param {number} quantity 
