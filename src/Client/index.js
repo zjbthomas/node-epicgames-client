@@ -265,6 +265,9 @@ class Launcher extends Events {
 
     if (auth) {
 
+      this.updateBearerCookie(this.account.auth);
+      this.account.auth.refreshCallback = this.updateBearerCookie.bind(this);
+
       if (this.config.useCommunicator) {
         this.communicator = new this.Communicator(this);
 
@@ -302,6 +305,10 @@ class Launcher extends Events {
 
     
     return false;
+  }
+
+  updateBearerCookie(auth) {
+    this.http.jar.setCookie(`EPIC_BEARER_TOKEN=${auth.accessToken}; domain=.${ENDPOINT.EPIC_ORIGIN}; Secure; HttpOnly; SameSite=None`, "https://" + ENDPOINT.EPIC_ORIGIN);
   }
 
   /**
@@ -629,9 +636,9 @@ class Launcher extends Events {
 
     return false;
   }
-  
+
   async newPurchase(offer) {
-    let { data: purchase } = await this.http.sendGet(`https://launcher-website-prod07.ol.epicgames.com/purchase?showNavigation=true&namespace=${offer.namespace}&offers=${offer.id}`);
+    let { data: purchase } = await this.http.sendGet(`https://${ENDPOINT.PORTAL_ORIGIN}/purchase?showNavigation=true&namespace=${offer.namespace}&offers=${offer.id}`);
     purchase = Cheerio.load(purchase);
     const token = purchase('#purchaseToken').val();
     return {

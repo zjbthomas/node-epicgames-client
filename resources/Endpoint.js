@@ -2,6 +2,9 @@
 
 module.exports = Object.freeze({
 
+  EPIC_ORIGIN: 'epicgames.com',
+  PORTAL_ORIGIN: 'ue-launcher-website-prod.ol.epicgames.com',
+
   EULA_TRACKING: 'https://eulatracking-public-service-prod06.ol.epicgames.com/eulatracking/api/public/agreements/{{namespace}}',
   ORDER_QUICKPURCHASE: 'https://orderprocessor-public-service-ecomprod01.ol.epicgames.com/orderprocessor/api/shared/accounts/{{account_id}}/orders/quickPurchase', // ?country=PL&locale=pl
   PURCHASE: 'https://payment-website-pci.ol.epicgames.com/purchase',
