@@ -12,11 +12,11 @@ const Prompt = Readline.createInterface({
 class AccountAuth {
 
   constructor(launcher) {
-    
+
     this.launcher = launcher;
     this.tokenTimeout = null;
     this.token = null;
-    
+    this.refreshCallback = null;
   }
 
   analytics(strategyFlags) {
@@ -457,6 +457,9 @@ class AccountAuth {
       if (data) {
 
         this.setAuthParams(data);
+        if (this.refreshCallback) {
+          this.refreshCallback(this);
+        }
         this.setTokenTimeout();
 
         this.launcher.emit('access_token_refreshed');
