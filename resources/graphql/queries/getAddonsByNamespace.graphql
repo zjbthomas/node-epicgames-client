@@ -1,0 +1,38 @@
+query getAddonsByNamespace($categories: String!, $count: Int!, $country: String!, $locale: String!, $namespace: String!, $sortBy: String!, $sortDir: String!) {
+    Catalog {
+        catalogOffers(namespace: $namespace, locale: $locale, params: {
+            category: $categories,
+            count: $count,
+            country: $country,
+            sortBy: $sortBy,
+            sortDir: $sortDir
+        }) {
+            elements {
+                countriesBlacklist
+                customAttributes {
+                    key
+                    value
+                }
+                description
+                developer
+                effectiveDate
+                id
+                isFeatured
+                keyImages {
+                    type
+                    url
+                }
+                lastModifiedDate
+                longDescription
+                namespace
+                offerType
+                productSlug
+                releaseDate
+                status
+                technicalDetails
+                title
+                urlSlug
+            }
+        }
+    }
+}

@@ -1,0 +1,10 @@
+query launcherQuery($namespace: String!, $offerId: String!) {
+    Launcher {
+        entitledOfferItems(namespace: $namespace, offerId: $offerId) {
+            namespace
+            offerId
+            entitledToAllItemsInOffer
+            entitledToAnyItemInOffer
+        }
+    }
+}

@@ -1,0 +1,11 @@
+query accountQuery($locale: String!, $countryCode: String) {
+    Account {
+        myAccount {
+            unlinkedDieselPlatforms(
+                countryCode: $countryCode,
+                locale: $locale,
+                newUserOnly: true
+            )
+        }
+    }
+}

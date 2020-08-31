@@ -1,0 +1,14 @@
+query getSalesEventDataById($salesEventId: String!) {
+    PriceEngine {
+        salesEvent(salesEventId: $salesEventId) {
+            endDate
+            eventSlug
+            grantInitialVoucher
+            id
+            voucherImages {
+                type
+                url
+            }
+        }
+    }
+}

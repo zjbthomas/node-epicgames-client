@@ -1,0 +1,14 @@
+query getSalesEventData {
+    PriceEngine {
+        salesEvents {
+            endDate
+            eventSlug
+            grantInitialVoucher
+            id
+            voucherImages {
+                type
+                url
+            }
+        }
+    }
+}

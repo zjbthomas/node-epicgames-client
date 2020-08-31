@@ -1,0 +1,28 @@
+query productReviewsQuery($sku: String!) {
+    OpenCritic {
+        productReviews(sku: $sku) {
+            id
+            name
+            openCriticScore
+            reviewCount
+            percentRecommended
+            openCriticUrl
+            award
+            topReviews {
+                publishedDate
+                externalUrl
+                snippet
+                language
+                score
+                author
+                ScoreFormat {
+                    id
+                    description
+                }
+                OutletId
+                outletName
+                displayScore
+            }
+        }
+    }
+}

@@ -1,0 +1,8 @@
+query playtimeTrackingQuery($accountId: String!) {
+    PlaytimeTracking {
+        total(accountId: $accountId) {
+            artifactId
+            totalTime
+        }
+    }
+}

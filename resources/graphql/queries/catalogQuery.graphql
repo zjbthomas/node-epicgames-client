@@ -1,0 +1,33 @@
+query catalogQuery($namespace: String!, $id: String!, $locale: String, $withOffers: Boolean!) {
+    Catalog {
+        catalogItem(namespace: $namespace, id: $id, locale: $locale) {
+            id
+            namespace
+            title
+            keyImages {
+                type
+                url
+            }
+            categories {
+                path
+            }
+            releaseInfo {
+                platform
+            }
+            customAttributes {
+                key
+                value
+            }
+            dlcItemList {
+                id
+            }
+            mainGameItem {
+                id
+            }
+            offers @include(
+                if :$withOffers) {
+                urlSlug
+            }
+        }
+    }
+}

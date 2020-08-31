@@ -1,0 +1,140 @@
+query storefrontDiscover($layoutSlug: String!, $locale: String!, $country: String!) {
+    Storefront {
+        discoverLayout(locale: $locale, slug: $layoutSlug) {
+            modules {
+                ...on PageHeader {
+                    __typename
+                    eyebrow
+                    type
+                    title
+                    description
+                }
+                ...on StorefrontBreaker {
+                    __typename
+                    type
+                    title
+                    titleGroup
+                    description
+                    backgroundColors
+                    layout
+                    link {
+                        src
+                        linkText
+                    }
+                    image {
+                        src
+                        alt
+                    }
+                }
+                ...on StorefrontFreeGames {
+                    __typename
+                    type
+                    title
+                }
+                ...on StorefrontCardGroup {
+                    __typename
+                    type
+                    title
+                    offerPresentation
+                    offerType
+                    titleIcon
+                    groupStyle
+                    hideTitle
+                    link {
+                        src
+                        linkText
+                    }
+                    offers {
+                        namespace
+                        id
+                        offer {
+                            title
+                            id
+                            namespace
+                            description
+                            keyImages {
+                                type
+                                url
+                            }
+                            seller {
+                                id
+                                name
+                            }
+                            productSlug
+                            urlSlug
+                            items {
+                                id
+                                namespace
+                            }
+                            customAttributes {
+                                key
+                                value
+                            }
+                            categories {
+                                path
+                            }
+                            price(country: $country) {
+                                totalPrice {
+                                    discountPrice
+                                    originalPrice
+                                    voucherDiscount
+                                    discount
+                                    fmtPrice(locale: $locale) {
+                                        originalPrice
+                                        discountPrice
+                                        intermediatePrice
+                                    }
+                                }
+                                lineOffers {
+                                    appliedRules {
+                                        id
+                                        endDate
+                                    }
+                                }
+                            }
+                            releaseDate
+                            effectiveDate
+                        }
+                    }
+                }
+                ...on StorefrontFeaturedCarousel {
+                    __typename
+                    type
+                    title
+                    slides {
+                        title
+                        eyebrow
+                        description
+                        backgroundColor
+                        image {
+                            src
+                            alt
+                        }
+                        mobileImage {
+                            src
+                            alt
+                        }
+                        link {
+                            src
+                            linkText
+                        }
+                        videoRecipe
+                    }
+                }
+                ...on StorefrontTiles {
+                    __typename
+                    type
+                    title
+                    tiles {
+                        label
+                        genre
+                        link {
+                            src
+                            linkText
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

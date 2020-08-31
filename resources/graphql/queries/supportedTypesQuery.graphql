@@ -1,0 +1,9 @@
+query supportedTypesQuery($sandboxId: String!) {
+    Product {
+        sandbox(sandboxId: $sandboxId) {
+            product {
+                supportedTypes
+            }
+        }
+    }
+}
