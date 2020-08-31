@@ -222,7 +222,7 @@ class Launcher extends Events {
   /**
    * @param {(object|string|number|function|)=} options credentials or twoFactorCode, check wiki.
    */
-  async login(options, exchangeCode=null) {
+  async login(options, exchangeCode = null) {
 
     let credentials = {
       email: this.config.email || '',
@@ -413,7 +413,7 @@ class Launcher extends Events {
    * @param {string} name 
    */
   findActiveEntitlementByName(name) {
-    return this.entitlements.find(entitlement => entitlement.entitlementName === name && entitlement.active === true);
+    return this.entitlements.find((entitlement) => entitlement.entitlementName === name && entitlement.active === true);
   }
 
   /**
@@ -695,8 +695,8 @@ class Launcher extends Events {
   async getProfiles(ids) {
     const limit = 100;
 
-    let qs = ids.map(id => (this.isDisplayName(id) ? this.lookup(id) : id));
-    qs = (await Promise.all(qs)).filter(id => id);
+    let qs = ids.map((id) => (this.isDisplayName(id) ? this.lookup(id) : id));
+    qs = (await Promise.all(qs)).filter((id) => id);
 
     if (!qs.length) return false;
 
@@ -706,8 +706,8 @@ class Launcher extends Events {
 
       for (let i = 0; i <= Math.floor(qs.length / limit); i += 1) {
         const accounts = qs.slice(i * limit, limit + (limit * i))
-          .map(id => (typeof id === 'object' ? id.id : id))
-          .map(id => `&accountId=${id}`)
+          .map((id) => (typeof id === 'object' ? id.id : id))
+          .map((id) => `&accountId=${id}`)
           .join('')
           .substr(1);
         promises.push(this.http.sendGet(
@@ -720,7 +720,7 @@ class Launcher extends Events {
       let data = [];
 
       for (let i = 0; i < result.length; i += 1) {
-        data = data.concat([...result[i].data.map(account => new User(this, {
+        data = data.concat([...result[i].data.map((account) => new User(this, {
           id: account.id,
           displayName: account.displayName,
           externalAuths: account.externalAuths,
@@ -751,14 +751,14 @@ class Launcher extends Events {
         `${this.account.auth.tokenType} ${this.account.auth.accessToken}`,
       );
       
-      let friends = (Array.isArray(data) ? data : []).map(account => ({
+      let friends = (Array.isArray(data) ? data : []).map((account) => ({
         accountId: account.accountId,
         status: account.status,
         direction: account.direction,
         created: new Date(account.created),
         favorite: account.favorite,
       }));
-      const ids = friends.map(friend => friend.accountId);
+      const ids = friends.map((friend) => friend.accountId);
       const profiles = {};
       (await this.getProfiles(ids)).forEach((profile) => {
         profiles[profile.id] = {
@@ -770,7 +770,7 @@ class Launcher extends Events {
       friends = friends.map((friend) => {
         if (profiles[friend.accountId]) return Object.assign(friend, profiles[friend.accountId]);
         return null;
-      }).filter(friend => friend); // filter removes null values from array of friends.
+      }).filter((friend) => friend); // filter removes null values from array of friends.
 
       return friends;
 
@@ -791,7 +791,7 @@ class Launcher extends Events {
 
     let friends = await this.getRawFriends(false);
 
-    friends = friends.map(friend => new Friend(this, friend)).filter(friend => friend); // filter removes null values from array of friends.
+    friends = friends.map((friend) => new Friend(this, friend)).filter((friend) => friend); // filter removes null values from array of friends.
 
     return friends;
   }
@@ -803,9 +803,9 @@ class Launcher extends Events {
 
     let friends = await this.getRawFriends(true);
     
-    friends = friends.map(friend => new FriendRequest(this, friend)).filter(friend => friend); // filter removes null values from array of friends.
+    friends = friends.map((friend) => new FriendRequest(this, friend)).filter((friend) => friend); // filter removes null values from array of friends.
 
-    return friends ? friends.filter(friend => friend.status === 'PENDING') : [];
+    return friends ? friends.filter((friend) => friend.status === 'PENDING') : [];
   }
 
   /**
@@ -822,7 +822,7 @@ class Launcher extends Events {
 
       const friends = await this.getFriends();
 
-      return friends.findIndex(friend => friend.id === user.id) > -1;
+      return friends.findIndex((friend) => friend.id === user.id) > -1;
 
     } catch (err) {
 
@@ -983,7 +983,7 @@ class Launcher extends Events {
     const user = await User.get(this, id);
     await this.communicator.sendProbe(`${user.id}@${this.communicator.host}`);
     try {
-      return await this.communicator.waitForEvent(`friend#${user.id}:status`, 5000, s => s.status);
+      return await this.communicator.waitForEvent(`friend#${user.id}:status`, 5000, (s) => s.status);
     } catch (err) {
       throw new Error(`Could not retrieve status, error: ${err}`);
     }
@@ -1121,7 +1121,7 @@ class Launcher extends Events {
 
       if (eula !== true) { throw new Error(`Cannot accept EULA for game ${game.Namespace}!`); }
 
-      const entitlement = this.entitlements.find(e => e.entitlementName === game.EntitlementName && e.namespace === game.Namespace && e.active === true);
+      const entitlement = this.entitlements.find((e) => e.entitlementName === game.EntitlementName && e.namespace === game.Namespace && e.active === true);
 
       if (!entitlement) {
 
@@ -1171,7 +1171,7 @@ class Launcher extends Events {
 
   async checkVersionByAppName(namespace, appName) {
     const assets = await this.checkAssetsVersions();
-    return assets.find(asset => asset.namespace === namespace && asset.appName === appName);
+    return assets.find((asset) => asset.namespace === namespace && asset.appName === appName);
   }
 
   /**
@@ -1207,8 +1207,8 @@ class Launcher extends Events {
     //  || this.http.jar.getCookies('https://epicgames.com').find(cookie => cookie.key === 'csrfToken');
     // csrfToken = csrfToken.value;
 
-    let xsrfToken = this.http.jar.getCookies('https://www.epicgames.com').find(cookie => cookie.key === 'XSRF-TOKEN')
-     || this.http.jar.getCookies('https://epicgames.com').find(cookie => cookie.key === 'XSRF-TOKEN');
+    let xsrfToken = this.http.jar.getCookies('https://www.epicgames.com').find((cookie) => cookie.key === 'XSRF-TOKEN')
+     || this.http.jar.getCookies('https://epicgames.com').find((cookie) => cookie.key === 'XSRF-TOKEN');
     xsrfToken = xsrfToken ? xsrfToken.value : null;
 
     await this.http.sendPost(
@@ -1221,8 +1221,8 @@ class Launcher extends Events {
       },
     );
 
-    xsrfToken = this.http.jar.getCookies('https://www.epicgames.com').find(cookie => cookie.key === 'XSRF-AM-TOKEN')
-     || this.http.jar.getCookies('https://epicgames.com').find(cookie => cookie.key === 'XSRF-AM-TOKEN');
+    xsrfToken = this.http.jar.getCookies('https://www.epicgames.com').find((cookie) => cookie.key === 'XSRF-AM-TOKEN')
+     || this.http.jar.getCookies('https://epicgames.com').find((cookie) => cookie.key === 'XSRF-AM-TOKEN');
     xsrfToken = xsrfToken.value;
 
     const response = await this.http.sendPost(
@@ -1317,8 +1317,8 @@ class Launcher extends Events {
     //  || this.http.jar.getCookies('https://epicgames.com').find(cookie => cookie.key === 'csrfToken');
     // csrfToken = csrfToken.value;
 
-    let xsrfToken = this.http.jar.getCookies('https://www.epicgames.com').find(cookie => cookie.key === 'XSRF-TOKEN')
-     || this.http.jar.getCookies('https://epicgames.com').find(cookie => cookie.key === 'XSRF-TOKEN');
+    let xsrfToken = this.http.jar.getCookies('https://www.epicgames.com').find((cookie) => cookie.key === 'XSRF-TOKEN')
+     || this.http.jar.getCookies('https://epicgames.com').find((cookie) => cookie.key === 'XSRF-TOKEN');
     xsrfToken = xsrfToken ? xsrfToken.value : null;
 
     await this.http.sendPost(
@@ -1331,8 +1331,8 @@ class Launcher extends Events {
       },
     );
 
-    xsrfToken = this.http.jar.getCookies('https://www.epicgames.com').find(cookie => cookie.key === 'XSRF-AM-TOKEN')
-     || this.http.jar.getCookies('https://epicgames.com').find(cookie => cookie.key === 'XSRF-AM-TOKEN');
+    xsrfToken = this.http.jar.getCookies('https://www.epicgames.com').find((cookie) => cookie.key === 'XSRF-AM-TOKEN')
+     || this.http.jar.getCookies('https://epicgames.com').find((cookie) => cookie.key === 'XSRF-AM-TOKEN');
     xsrfToken = xsrfToken.value;
     
     const {
