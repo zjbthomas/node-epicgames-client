@@ -1,0 +1,14 @@
+query bulkWishlistQuery($bulkQueryRequest: [WishRequest] !) {
+    Wishlist {
+        bulkQueryWishOffers(bulkQueryRequest: $bulkQueryRequest) {
+            elements {
+                id,
+                order,
+                created,
+                offerId,
+                updated,
+                namespace
+            }
+        }
+    }
+}

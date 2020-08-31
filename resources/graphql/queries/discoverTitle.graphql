@@ -1,0 +1,12 @@
+query discoverTitle($layoutSlug: String!, $locale: String!) {
+    Storefront {
+        discoverLayout(locale: $locale, slug: $layoutSlug) {
+            modules {
+                ...on PageHeader {
+                    __typename
+                    title
+                }
+            }
+        }
+    }
+}

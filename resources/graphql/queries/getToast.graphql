@@ -1,0 +1,85 @@
+query getToast($country: String!, $locale: String) {
+    Wishlist {
+        wishlistToast {
+            offers {
+                releaseCycle {
+                    namespace
+                    offerId
+                    currentStatus
+                    previousStatus
+
+                    offer {
+                        id
+                        title
+                        offerType
+                        effectiveDate
+                        expiryDate
+                        status
+                        isCodeRedemptionOnly
+                        keyImages {
+                            type
+                            url
+                            width
+                            height
+                        }
+                        price(country: $country) {
+                            totalPrice {
+                                originalPrice
+                                discountPrice
+                                discount
+                                fmtPrice(locale: $locale) {
+                                    originalPrice
+                                    discountPrice
+                                    intermediatePrice
+                                }
+                                currencyCode
+                                currencyInfo {
+                                    decimals
+                                    symbol
+                                }
+                            }
+                        }
+                    }
+                }
+                onSale {
+                    namespace
+                    offerId
+                    promotionRuleId
+                    saleExpirationDate
+                    offer {
+                        id
+                        title
+                        offerType
+                        effectiveDate
+                        expiryDate
+                        status
+                        isCodeRedemptionOnly
+                        keyImages {
+                            type
+                            url
+                            width
+                            height
+                        }
+                        price(country: $country) {
+                            totalPrice {
+                                originalPrice
+                                discountPrice
+                                discount
+                                fmtPrice(locale: $locale) {
+                                    originalPrice
+                                    discountPrice
+                                    intermediatePrice
+                                }
+                                currencyCode
+                                currencyInfo {
+                                    decimals
+                                    symbol
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

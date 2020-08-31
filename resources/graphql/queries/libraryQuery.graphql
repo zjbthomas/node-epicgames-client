@@ -1,0 +1,21 @@
+query libraryQuery($cursor: String, $excludeNs: [String]) {
+    Library {
+        libraryItems(cursor: $cursor, params: {
+            excludeNs: $excludeNs,
+            includeMetadata: true
+        }) {
+            records {
+                catalogItemId
+                namespace
+                appName
+                productId
+                product {
+                    supportedTypes
+                }
+            }
+            responseMetadata {
+                nextCursor
+            }
+        }
+    }
+}

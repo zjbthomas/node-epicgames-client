@@ -1,0 +1,29 @@
+query discoverMeta($layoutSlug: String!, $locale: String!) {
+    Storefront {
+        discoverLayout(locale: $locale, slug: $layoutSlug) {
+            seo {
+                title
+                description
+                keywords
+                image {
+                    src
+                    altText
+                }
+                twitter {
+                    title
+                    description
+                }
+                og {
+                    title
+                    description
+                    image {
+                        src
+                        alt
+                        width
+                        height
+                    }
+                }
+            }
+        }
+    }
+}

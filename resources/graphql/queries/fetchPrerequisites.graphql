@@ -1,0 +1,9 @@
+query fetchPrerequisites($offerParams: [OfferParams]) {
+    Launcher {
+        prerequisites(offerParams: $offerParams) {
+            namespace,
+            offerId,
+            satisfiesPrerequisites
+        }
+    }
+}

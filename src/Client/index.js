@@ -5,7 +5,7 @@ const Events = require('events');
 const Cheerio = require('cheerio');
 const exitHook = require('exit-hook');
 
-const GRAPHQL = require('../../resources/GraphQL');
+
 const ENDPOINT = require('../../resources/Endpoint');
 
 const EPlatform = require('../../enums/Platform');
@@ -19,6 +19,7 @@ const Communicator = require('../Communicator');
 const User = require('../User');
 const Friend = require('../Friend');
 const FriendRequest = require('../FriendRequest');
+const GraphQL = require('./GraphQL');
 
 const Party = require('../Party');
 const PartyInvitation = require('../Party/PartyInvitation');
@@ -131,6 +132,9 @@ class Launcher extends Events {
     this.PartyMemberConfirmation = Launcher.PartyMemberConfirmation;
     this.PartyMemberConnection = Launcher.PartyMemberConnection;
     this.PartyMemberMeta = Launcher.PartyMemberMeta;
+
+    this.graphql = new GraphQL(this.http, this.debug);
+    this.graphql.assign(this);
 
     exitHook(() => {
       this.emit('exit');
@@ -540,50 +544,6 @@ class Launcher extends Events {
       );
 
       return data;
-
-    } catch (err) {
-
-      this.debug.print(new Error(err));
-
-    }
-
-    return false;
-  }
-  
-  /**
-   * Returns evaluation of product code.
-   * @param {string} codeId 
-   * @param {string} locale 
-   */
-  async evaluateProductCode(codeId, locale = 'en-US') {
-    
-    try {
-
-      const { data } = await this.http.sendGraphQL(null, GRAPHQL.EVALUATE_CODE_QUERY, { codeId, locale });
-
-      return JSON.parse(data);
-
-    } catch (err) {
-
-      this.debug.print(new Error(err));
-
-    }
-
-    return false;
-  }
-  
-  /**
-   * Returns redemption status of product code.
-   * @param {string} codeId 
-   * @param {string} source 
-   */
-  async redeemProductCode(codeId, source = 'DieselWebClient') {
-    
-    try {
-
-      const { data } = await this.http.sendGraphQL(null, GRAPHQL.REDEEM_CODE_MUTATION, { codeId, source });
-
-      return JSON.parse(data);
 
     } catch (err) {
 
