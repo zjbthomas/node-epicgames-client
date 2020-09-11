@@ -569,6 +569,37 @@ class Communicator extends EventEmitter {
 
   }
 
+  /**
+   * Join a party MUC room given a partyId.
+   * @param partyId
+   * @returns {Promise<*>}
+   */
+  async joinMuc(partyId) {
+
+    // Set the party JID in context for a later use within a MUC (FE: send a party chat message.).
+    this.partyJID = new JID(`Party-${partyId}@muc.prod.ol.epicgames.com`)
+
+    let nickName = `${this.launcher.account.displayName}:${this.launcher.account.id}:${this.resource}`
+
+    return this.stream.joinRoom(this.partyJID, nickName)
+  }
+
+  /**
+   * Sends a message to the client's party.
+   * @param message
+   * @returns {Promise<*>}
+   */
+  async sendPartyMessage(message) {
+    if (!this.partyJID) return null;
+
+    return this.sendRequest({
+      to: this.partyJID,
+      type: 'groupchat',
+      body: message,
+    });
+
+  }
+
   async sendRequest(data) {
     return this.stream.sendMessage(data);
   }
@@ -585,7 +616,17 @@ class Communicator extends EventEmitter {
       status: JSON.stringify(typeof status === 'object' ? status : { Status: status }),
     });
   }
+  
+  async updatePersonalStatus(to, status) {
+    if (!status) return this.stream.sendPresence(null);
+    to = new JID(`${to}@${this.host}`);
 
+    return this.stream.sendPresence({
+      to: new JID(to),
+      status: JSON.stringify(typeof status === 'object' ? status : { Status: status }),
+    });
+  }
+  
   /**
    * Sending request for presence.
    * @param {(JID|string)} to 
