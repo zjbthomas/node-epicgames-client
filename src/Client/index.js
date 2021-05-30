@@ -83,7 +83,7 @@ class Launcher extends Events {
 
       storage: Path.join(process.cwd(), '/.egstore', Crypto.createHash('sha256').update(config.email || 'default').digest('hex')),
       rememberLastSession: false,
-      rememberDevicesPath: Path.join(process.cwd(), './devicesStorage.json'),
+      rememberDevicesPath: Path.join(process.cwd(), './device_auths.json'),
       http: {},
 
       language: 'en-EN',

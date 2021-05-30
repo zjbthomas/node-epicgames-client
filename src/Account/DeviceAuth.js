@@ -54,11 +54,10 @@ module.exports = class DeviceAuth {
     let deviceSecret = null;
 
     if (auths[email]) {
-      const latest = auths[email][auths[email].length - 1];
-       deviceId = latest.deviceId;
-       deviceAccountId = latest.accountId;
-       deviceSecret = latest.secret;
-    }
+      deviceId = auths[email].device_id;
+      deviceAccountId = auths[email].account_id;
+      deviceSecret = auths[email].secret;
+   }
 
     if (!deviceId || !deviceAccountId || !deviceSecret) {
       const create = await this.createSessionDeviceAuth(email);
