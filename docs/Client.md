@@ -251,14 +251,6 @@ Fetchs all offers for given namespace.
   - **locale** - string, e.g. `en-US` (default)
 - **Returns:** `array` of offers or `false`
 
-### quickPurchase(offer, quantity)
-- **Arguments**
-  - **offer** - object
-    - **id** - string, offer's id
-    - **namespace** - string, offer's namespace
-  - **quantity** - number
-- **Returns:** `boolean`
-
 ### getProfile(id)
 Same as [lookup(name)](#lookup-name), but you can search by id or name.
 - **Arguments**

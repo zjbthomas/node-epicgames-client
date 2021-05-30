@@ -589,49 +589,6 @@ class Launcher extends Events {
   }
 
 
-  /**
-   * Buy offer.
-   * @param {Object} offer object with `offerId` and `namespace`
-   * @param {number} quantity
-   */
-  async quickPurchase(offer, quantity) {
-
-    try {
-
-      const lineOffers = [
-        {
-          offerId: offer.id,
-          quantity: quantity || 1,
-          namespace: offer.namespace,
-        },
-      ];
-
-      const { data } = await this.http.send(
-        'POST',
-        ENDPOINT.ORDER_QUICKPURCHASE.replace('{{account_id}}', this.account.id),
-        `${this.account.auth.tokenType} ${this.account.auth.accessToken}`,
-        {
-          salesChannel: 'Launcher-purchase-client',
-          entitlementSource: 'Launcher-purchase-client',
-          returnSplitPaymentItems: false,
-          lineOffers,
-        },
-        true,
-        null,
-        true,
-      );
-
-      return data.quickPurchaseStatus ? data.quickPurchaseStatus : false;
-
-    } catch (err) {
-
-      this.debug.print(new Error(err));
-
-    }
-
-    return false;
-  }
-
   async newPurchase(offer) {
     let { data: purchase } = await this.http.sendGet(`https://${ENDPOINT.PORTAL_ORIGIN}/purchase?showNavigation=true&namespace=${offer.namespace}&offers=${offer.id}`);
     purchase = Cheerio.load(purchase);
@@ -703,27 +660,13 @@ class Launcher extends Events {
 
   async purchase(offer, quantity) {
 
-    const quickPurchaseStatus = await this.quickPurchase(offer, quantity);
-
-    switch (quickPurchaseStatus) {
-
-      case 'SUCCESS':
-        return true;
-
-      case 'CHECKOUT': {
-        const purchase = await this.newPurchase(offer);
-        if (!purchase || !purchase.token) {
-          throw new Error('Unable to acquire purchase token');
-        }
-        const order = await this.purchaseOrderPreview(purchase, offer);
-        if (!order) return false;
-        return this.purchaseOrderConfirm(purchase, order);
-      }
-
-      default:
-        throw new Error(`Unknown quick purchase status: ${quickPurchaseStatus}`);
-
+    const purchase = await this.newPurchase(offer);
+    if (!purchase || !purchase.token) {
+      throw new Error('Unable to acquire purchase token');
     }
+    const order = await this.purchaseOrderPreview(purchase, offer);
+    if (!order) return false;
+    return this.purchaseOrderConfirm(purchase, order);
 
   }
 
