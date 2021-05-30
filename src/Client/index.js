@@ -37,7 +37,7 @@ class Launcher extends Events {
   static get Party() { return Party; }
 
   static get PartyInvitation() { return PartyInvitation; }
-  
+
   static get PartyJoinRequest() { return PartyJoinRequest; }
 
   static get PartyMeta() { return PartyMeta; }
@@ -51,7 +51,7 @@ class Launcher extends Events {
   static get PartyMemberMeta() { return PartyMemberMeta; }
 
   /**
-   * @param {Object} config 
+   * @param {Object} config
    * @param {Object} config.email
    * @param {Object} config.password
    * @param {Object=} config.debug if you need console/file output with logs. Simple you can use `console.log`
@@ -83,6 +83,7 @@ class Launcher extends Events {
 
       storage: Path.join(process.cwd(), '/.egstore', Crypto.createHash('sha256').update(config.email || 'default').digest('hex')),
       rememberLastSession: false,
+      rememberDevicesPath: Path.join(process.cwd(), './devicesStorage.json'),
       http: {},
 
       language: 'en-EN',
@@ -118,7 +119,7 @@ class Launcher extends Events {
 
     this.account = null;
     this.communicator = null;
-    // this.communicatorFriends = [];
+    this.communicatorFriends = [];
 
     this.auth = null;
     this.entitlements = [];
@@ -139,12 +140,12 @@ class Launcher extends Events {
     exitHook(() => {
       this.emit('exit');
     });
-    
+
   }
 
   /**
    * Sets client language
-   * @param {string} language 
+   * @param {string} language
    */
   setLanguage(language) {
     this.http.setHeader('Accept-Language', language);
@@ -154,7 +155,7 @@ class Launcher extends Events {
    * Client initialize
    */
   async init() {
-    
+
     try {
 
       let wait = false;
@@ -169,7 +170,7 @@ class Launcher extends Events {
       }
 
       if (wait) {
-        
+
         this.debug.print(`Problems with servers, need wait ${wait.expectedWait} seconds.`);
         const sto = setTimeout(() => {
           clearTimeout(sto);
@@ -177,7 +178,7 @@ class Launcher extends Events {
         }, wait.expectedWait * 1000);
 
       } else {
-        
+
         this.auth = new Auth(this);
         const auth = await this.auth.auth();
 
@@ -223,9 +224,10 @@ class Launcher extends Events {
 
     return false;
   }
-  
+
   /**
    * @param {(object|string|number|function|)=} options credentials or twoFactorCode, check wiki.
+   * @param exchangeCode
    */
   async login(options, exchangeCode=null) {
 
@@ -234,8 +236,9 @@ class Launcher extends Events {
       password: this.config.password || '',
       twoFactorCode: false,
       captcha: null,
+      useDeviceAuth: false,
     };
-    
+
     switch (typeof options) { // backward compatibility
 
       case 'object':
@@ -261,7 +264,7 @@ class Launcher extends Events {
         if (typeof options !== 'undefined') {
           throw new Error('login() `options` must be object');
         }
-        
+
     }
 
     this.account = new Account(this);
@@ -275,27 +278,27 @@ class Launcher extends Events {
       if (this.config.useCommunicator) {
         this.communicator = new this.Communicator(this);
 
-        // this.communicator.on('friends', (friends) => {
-        //   friends = friends.map(friend => new Friend(this, { 
-        //     ...friend,
-        //     status: 'ACCEPTED',
-        //   }));
-        //   this.communicatorFriends = friends;
-        // });
+        this.communicator.on('friends', (friends) => {
+          friends = friends.map(friend => new Friend(this, {
+            ...friend,
+            status: 'ACCEPTED',
+          }));
+          this.communicatorFriends = friends;
+        });
 
-        // this.communicator.on('friend:added', (friend) => {
-        //   this.communicatorFriends.push(friend);
-        // });
+        this.communicator.on('friend:added', (friend) => {
+          this.communicatorFriends.push(friend);
+        });
 
-        // this.communicator.on('friend:removed', (removedFriend) => {
-        //   const friend = this.communicatorFriends.find(f => f.id === removedFriend.id);
-        //   if (friend) this.communicatorFriends.splice(this.communicatorFriends.indexOf(friend), 1);
-        // });
+        this.communicator.on('friend:removed', (removedFriend) => {
+          const friend = this.communicatorFriends.find(f => f.id === removedFriend.id);
+          if (friend) this.communicatorFriends.splice(this.communicatorFriends.indexOf(friend), 1);
+        });
 
-        // this.communicator.on('friend:status', (status) => {
-        //   const friend = this.communicatorFriends.find(f => f.id === status.sender.id);
-        //   if (friend) friend.status = status;
-        // });
+        this.communicator.on('friend:status', (status) => {
+          const friend = this.communicatorFriends.find(f => f.id === status.sender.id);
+          if (friend) friend.status = status;
+        });
 
         await this.communicator.connect();
       }
@@ -307,7 +310,7 @@ class Launcher extends Events {
       return true;
     }
 
-    
+
     return false;
   }
 
@@ -316,7 +319,7 @@ class Launcher extends Events {
   }
 
   /**
-   * @param {Object} options 
+   * @param {Object} options
    * @param {string} options.country e.g. `US`, `PL`
    * @param {string} options.firstName
    * @param {string} options.lastName
@@ -348,7 +351,7 @@ class Launcher extends Events {
     this.emit('logouted');
 
     this.removeAllListeners();
-    
+
     return true;
   }
 
@@ -377,7 +380,7 @@ class Launcher extends Events {
   async getEpicDomains() {
 
     try {
-      
+
       const { data } = await this.http.sendGet(ENDPOINT.DOMAINS);
 
       return data;
@@ -389,7 +392,7 @@ class Launcher extends Events {
     }
 
     return false;
-  } 
+  }
 
   /**
    * Returns account's id.
@@ -398,12 +401,12 @@ class Launcher extends Events {
   async lookup(displayName) {
 
     try {
-      
+
       const { data } = await this.http.sendGet(
         `${ENDPOINT.ACCOUNT_BY_NAME}/${encodeURI(displayName)}`,
         `${this.account.auth.tokenType} ${this.account.auth.accessToken}`,
       );
-      
+
       return {
         id: data.id,
         accountName: data.displayName,
@@ -422,7 +425,7 @@ class Launcher extends Events {
   }
 
   /**
-   * @param {string} name 
+   * @param {string} name
    */
   findActiveEntitlementByName(name) {
     return this.entitlements.find(entitlement => entitlement.entitlementName === name && entitlement.active === true);
@@ -432,9 +435,9 @@ class Launcher extends Events {
    * Returns account's entitlements.
    */
   async getEntitlements() {
-    
+
     try {
-      
+
       const { data } = await this.http.sendGet(
         `${ENDPOINT.ENTITLEMENTS.replace('{{account_id}}', this.account.id)}?start=0&count=5000`,
         `${this.account.auth.tokenType} ${this.account.auth.accessToken}`,
@@ -450,14 +453,14 @@ class Launcher extends Events {
 
     return false;
   }
-  
+
   /**
    * Returns offers for game.
-   * @param {*} slug 
-   * @param {*} locale 
+   * @param {*} slug
+   * @param {*} locale
    */
   async getProductForSlug(slug, locale = 'en-US') {
-    
+
     try {
 
       const { data } = await this.http.sendGet(
@@ -474,14 +477,14 @@ class Launcher extends Events {
 
     return false;
   }
-  
+
   /**
    * Returns offers for game.
-   * @param {*} slug 
-   * @param {*} locale 
+   * @param {*} slug
+   * @param {*} locale
    */
   async getBundleForSlug(slug, locale = 'en-US') {
-    
+
     try {
 
       const { data } = await this.http.sendGet(
@@ -498,15 +501,15 @@ class Launcher extends Events {
 
     return false;
   }
-  
+
   /**
    * Returns offers for game.
    * @param {*} namespace epicgame's namespace
-   * @param {*} count 
-   * @param {*} start 
+   * @param {*} count
+   * @param {*} start
    */
   async getOffersForNamespace(namespace, count, start, status) {
-    
+
     try {
 
       if (typeof count !== 'number') count = 10;
@@ -531,12 +534,12 @@ class Launcher extends Events {
 
   /**
    * Returns offers for game.
-   * @param {*} country 
-   * @param {*} allowCountries 
-   * @param {*} locale 
+   * @param {*} country
+   * @param {*} allowCountries
+   * @param {*} locale
    */
   async freeGamesPromotions(country = 'US', allowCountries = 'US', locale = 'en-US') {
-    
+
     try {
 
       const { data } = await this.http.sendGet(
@@ -589,10 +592,10 @@ class Launcher extends Events {
   /**
    * Buy offer.
    * @param {Object} offer object with `offerId` and `namespace`
-   * @param {number} quantity 
+   * @param {number} quantity
    */
   async quickPurchase(offer, quantity) {
-    
+
     try {
 
       const lineOffers = [
@@ -639,7 +642,7 @@ class Launcher extends Events {
   }
 
   async purchaseOrderPreview(purchase, offer) {
-    
+
     const { data } = await this.http.sendPost(
       `${ENDPOINT.PURCHASE}/order-preview`,
       `${this.account.auth.tokenType} ${this.account.auth.accessToken}`,
@@ -694,7 +697,7 @@ class Launcher extends Events {
         'x-requested-with': purchase.token,
       },
     );
-    
+
     return data && data.confirmation;
   }
 
@@ -799,7 +802,7 @@ class Launcher extends Events {
         `${ENDPOINT.FRIENDS}/${this.account.id}?includePending=${!!includePending}`,
         `${this.account.auth.tokenType} ${this.account.auth.accessToken}`,
       );
-      
+
       let friends = (Array.isArray(data) ? data : []).map(account => ({
         accountId: account.accountId,
         status: account.status,
@@ -851,7 +854,7 @@ class Launcher extends Events {
   async getFriendRequests() {
 
     let friends = await this.getRawFriends(true);
-    
+
     friends = friends.map(friend => new FriendRequest(this, friend)).filter(friend => friend); // filter removes null values from array of friends.
 
     return friends ? friends.filter(friend => friend.status === 'PENDING') : [];
@@ -914,7 +917,7 @@ class Launcher extends Events {
   async blockFriend(id) {
 
     try {
-      
+
       const user = await User.get(this, id);
 
       if (!user) { return false; }
@@ -948,11 +951,11 @@ class Launcher extends Events {
   async removeFriend(id) {
 
     try {
-      
+
       const user = await User.get(this, id);
 
       if (!user) { return false; }
-      
+
       await this.http.send(
         'DELETE',
         `${ENDPOINT.FRIENDS}/${this.account.id}/${user.id}`,
@@ -981,13 +984,13 @@ class Launcher extends Events {
    * @return {boolean}
    */
   async inviteFriend(id) {
-    
+
     try {
 
       const user = await User.get(this, id);
 
       if (!user) { return false; }
-        
+
       await this.http.sendPost(
         `${ENDPOINT.FRIENDS}/${this.account.id}/${user.id}`,
         `${this.account.auth.tokenType} ${this.account.auth.accessToken}`,
@@ -1042,7 +1045,7 @@ class Launcher extends Events {
    * Returns launcher's status e.g. `DEPRECATED`.
    */
   async getLauncherStatus() {
-    
+
     try {
 
       const { data } = await this.http.sendGet(
@@ -1106,7 +1109,7 @@ class Launcher extends Events {
       if (err.message === 'errors.com.epicgames.eulatracking.agreement_not_found') {
         return true;
       }
-      
+
       this.debug.print(`Cannot get EULA for namespace ${namespace}`);
       this.debug.print(new Error(err));
 
@@ -1117,10 +1120,10 @@ class Launcher extends Events {
 
   /**
    * Accepting eula received in `checkEULA()` method.
-   * @param {Object} eula 
+   * @param {Object} eula
    */
   async acceptEULA(eula) {
-    
+
     try {
 
       const { response } = await this.http.sendPost(
@@ -1142,11 +1145,11 @@ class Launcher extends Events {
 
   /**
    * Run a game.
-   * @param {Object} game e.g. `require('epicgames-fortnite-client')` 
+   * @param {Object} game e.g. `require('epicgames-fortnite-client')`
    * @param {*} options options for game client
    */
   async runGame(game, options) {
-    
+
     try {
 
       this.debug.print(`Running game ${game.Namespace}`);
@@ -1175,7 +1178,7 @@ class Launcher extends Events {
       if (!entitlement) {
 
         if (typeof game.StoreOfferId === 'undefined') { throw new Error(`Account don't have game "${game.Name}" and cannot buy (no StoreOfferId).`); }
-        
+
         const purchase = await this.purchase({
           id: game.StoreOfferId,
           namespace: game.Namespace,
@@ -1188,15 +1191,15 @@ class Launcher extends Events {
         this.debug.print(`Game "${game.Name}" has been bought!`);
 
       }
-      
+
       // const a = await this.checkVersionByAppName(game.Namespace, game.Name);
       // console.dir(a);
-      
+
       // options = {
 
       //   ...options,
       // };
-      
+
       const gameClient = new game.Client(this, options);
 
       if (!await gameClient.init()) { throw new Error(`Cannot initialize game ${game.Namespace}!`); }
@@ -1231,19 +1234,19 @@ class Launcher extends Events {
     const exchange = await this.account.auth.exchange();
 
     await this.http.sendGet(`https://accounts.epicgames.com/exchange?exchangeCode=${exchange.code}&redirectUrl=https%3A%2F%2Fepicgames.com%2Fsite%2Faccount`);
-  
+
     const { data } = await this.http.sendGet(
       'https://www.epicgames.com/account/resendEmailVerification',
       `${this.account.auth.tokenType} ${this.account.auth.accessToken}`,
     );
-    
+
     return data.success;
   }
 
   /**
    * Enable two factor authentication.
    * @param {string} type `authenticator` or `email`
-   * @param {(string|number|function)} twoFactorCode 
+   * @param {(string|number|function)} twoFactorCode
    */
   async enableTwoFactor(type, twoFactorCode) {
 
@@ -1251,13 +1254,13 @@ class Launcher extends Events {
 
     await this.http.sendGet(`https://accounts.epicgames.com/exchange?exchangeCode=${exchange.code}&redirectUrl=https%3A%2F%2Fepicgames.com%2Fsite%2Faccount`);
     await this.http.sendGet('https://www.epicgames.com/account/password');
-    
+
     // let csrfToken = this.http.jar.getCookies('https://www.epicgames.com').find(cookie => cookie.key === 'csrfToken')
     //  || this.http.jar.getCookies('https://epicgames.com').find(cookie => cookie.key === 'csrfToken');
     // csrfToken = csrfToken.value;
 
     let xsrfToken = this.http.jar.getCookies('https://www.epicgames.com').find(cookie => cookie.key === 'XSRF-TOKEN')
-     || this.http.jar.getCookies('https://epicgames.com').find(cookie => cookie.key === 'XSRF-TOKEN');
+      || this.http.jar.getCookies('https://epicgames.com').find(cookie => cookie.key === 'XSRF-TOKEN');
     xsrfToken = xsrfToken ? xsrfToken.value : null;
 
     await this.http.sendPost(
@@ -1271,7 +1274,7 @@ class Launcher extends Events {
     );
 
     xsrfToken = this.http.jar.getCookies('https://www.epicgames.com').find(cookie => cookie.key === 'XSRF-AM-TOKEN')
-     || this.http.jar.getCookies('https://epicgames.com').find(cookie => cookie.key === 'XSRF-AM-TOKEN');
+      || this.http.jar.getCookies('https://epicgames.com').find(cookie => cookie.key === 'XSRF-AM-TOKEN');
     xsrfToken = xsrfToken.value;
 
     const response = await this.http.sendPost(
@@ -1288,7 +1291,7 @@ class Launcher extends Events {
         'x-xsrf-token': xsrfToken,
       },
     );
-    
+
     if (response.response.statusCode !== 200) {
       throw new Error(response.data.message);
     }
@@ -1304,7 +1307,7 @@ class Launcher extends Events {
     } = response;
 
     let otp;
-      
+
     switch (typeof twoFactorCode) {
 
       case 'string':
@@ -1314,7 +1317,7 @@ class Launcher extends Events {
       case 'number':
         otp = twoFactorCode;
         break;
-          
+
       case 'function':
         otp = await twoFactorCode(secret, otpauth);
         break;
@@ -1361,13 +1364,13 @@ class Launcher extends Events {
 
     await this.http.sendGet(`https://accounts.epicgames.com/exchange?exchangeCode=${exchange.code}&redirectUrl=https%3A%2F%2Fepicgames.com%2Fsite%2Faccount`);
     await this.http.sendGet('https://www.epicgames.com/account/password');
-    
+
     // let csrfToken = this.http.jar.getCookies('https://www.epicgames.com').find(cookie => cookie.key === 'csrfToken')
     //  || this.http.jar.getCookies('https://epicgames.com').find(cookie => cookie.key === 'csrfToken');
     // csrfToken = csrfToken.value;
 
     let xsrfToken = this.http.jar.getCookies('https://www.epicgames.com').find(cookie => cookie.key === 'XSRF-TOKEN')
-     || this.http.jar.getCookies('https://epicgames.com').find(cookie => cookie.key === 'XSRF-TOKEN');
+      || this.http.jar.getCookies('https://epicgames.com').find(cookie => cookie.key === 'XSRF-TOKEN');
     xsrfToken = xsrfToken ? xsrfToken.value : null;
 
     await this.http.sendPost(
@@ -1381,9 +1384,9 @@ class Launcher extends Events {
     );
 
     xsrfToken = this.http.jar.getCookies('https://www.epicgames.com').find(cookie => cookie.key === 'XSRF-AM-TOKEN')
-     || this.http.jar.getCookies('https://epicgames.com').find(cookie => cookie.key === 'XSRF-AM-TOKEN');
+      || this.http.jar.getCookies('https://epicgames.com').find(cookie => cookie.key === 'XSRF-AM-TOKEN');
     xsrfToken = xsrfToken.value;
-    
+
     const {
       data: {
         isSuccess,

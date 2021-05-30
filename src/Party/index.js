@@ -84,6 +84,12 @@ class Party {
   // join() {
   // }
 
+  async sendMessage(message) {
+    if (!this.app.communicator) return null;
+
+    return await this.app.communicator.sendPartyMessage(message);
+  }
+
   async patch(updated, deleted, isForced) {
 
     if (!isForced && this.isPatching) {
@@ -93,7 +99,7 @@ class Party {
 
     this.isPatching = true;
     const revision = parseInt(this.revision, 10);
-    
+
     await this.app.http.send(
       'PATCH',
       `https://party-service-prod.ol.epicgames.com/party/api/v1/${this.app.id}/parties/${this.id}`,
@@ -131,7 +137,7 @@ class Party {
 
   updatePresence() {
     let partyJoinInfoData;
-    
+
     if (
       this.config.privacy.presencePermission === 'None'
       || (this.config.privacy.presencePermission === 'Leader' && this.leader.id !== this.me.id)
@@ -199,7 +205,7 @@ class Party {
       && p.onlyLeaderFriendsCanJoin === privacy.PrivacySettings.bOnlyLeaderFriendsCanJoin;
     });
     if (privacy) this.config.privacy = privacy;
-    
+
   }
 
   parseConfiguration(config) {
@@ -246,7 +252,7 @@ class Party {
     return data;
   }
 
-  static async create(app, config) { 
+  static async create(app, config) {
     if (!app.communicator) return null;
     config = {
       ...app.config.defaultPartyConfig,
@@ -285,6 +291,8 @@ class Party {
     app.party = new this(app, data);
     // await app.party.waitForRevision(1);
     await app.party.setPrivacy(config.privacy);
+    //Join the communicator multi user chat (party chat).
+    await app.communicator.joinMuc(app.party.id);
     // await app.party.waitForRevision(2);
     return app.party;
   }
