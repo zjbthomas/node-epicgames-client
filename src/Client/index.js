@@ -107,7 +107,7 @@ class Launcher extends Events {
     };
 
     if (!Fs.existsSync(this.config.storage)) {
-      Fs.mkdirSync(this.config.storage);
+      Fs.mkdirSync(this.config.storage, { recursive: true });
     }
 
     this.debug = new Debug({
