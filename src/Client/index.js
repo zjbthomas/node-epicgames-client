@@ -624,6 +624,10 @@ class Launcher extends Events {
       },
     );
 
+    if (data.orderResponse && data.orderResponse.error) {
+      throw new Error(data.orderResponse.message);
+    }
+
     return data.syncToken ? data : false;
   }
 
