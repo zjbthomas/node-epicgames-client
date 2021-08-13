@@ -1,4 +1,4 @@
-const { JID, createClient: XMPPClient } = require('stanza.io');
+const { JID, createClient: XMPPClient } = require('stanza');
 const EventEmitter = require('events');
 const UUID = require('uuid/v4');
 
