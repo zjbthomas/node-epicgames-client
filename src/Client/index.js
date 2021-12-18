@@ -590,8 +590,10 @@ class Launcher extends Events {
 
 
   async newPurchase(offer) {
-    let { data: purchase } = await this.http.sendGet(`https://${ENDPOINT.PORTAL_ORIGIN}/purchase?showNavigation=true&namespace=${offer.namespace}&offers=${offer.id}`);
+    //let { data: purchase } = await this.http.sendGet(`https://${ENDPOINT.PORTAL_ORIGIN}/purchase?showNavigation=true&namespace=${offer.namespace}&offers=${offer.id}`);
+    let { data: purchase } = await this.http.sendGet(`https://ue-launcher-website-prod.ol.epicgames.com/purchase?showNavigation=true&namespace=b0ebefb11a9145488af78f6d2488afff&offers=1ad9b7fca007477ca454d2048d019d2f`);
     purchase = Cheerio.load(purchase);
+    print(purchase)
     const token = purchase('#purchaseToken').val();
     return {
       token,
